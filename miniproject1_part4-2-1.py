@@ -71,6 +71,17 @@ def download_glove_embeddings_gdrive(model_type):
 
 
 # @st.cache_data()
+<<<<<<< HEAD
+def load_glove_embeddings_gdrive(model_type,embeddings_path,word_index_dict_path):
+    # word_index_temp = "word_index_dict_" + str(model_type) + "_temp.pkl"
+    # embeddings_temp = "embeddings_" + str(model_type) + "_temp.npy"
+
+    # Load word index dictionary
+    word_index_dict = pickle.load(open(word_index_dict_path, "rb"), encoding="latin")
+
+    # Load embeddings numpy
+    embeddings = np.load(embeddings_path)
+=======
 def load_glove_embeddings_gdrive(model_type):
     word_index_temp = "word_index_dict_" + str(model_type) + "_temp.pkl"
     embeddings_temp = "embeddings_" + str(model_type) + "_temp.npy"
@@ -80,6 +91,7 @@ def load_glove_embeddings_gdrive(model_type):
 
     # Load embeddings numpy
     embeddings = np.load(embeddings_temp)
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
 
     return word_index_dict, embeddings
 
@@ -135,7 +147,11 @@ def averaged_glove_embeddings_gdrive(sentence, word_index_dict, embeddings, mode
     words = sentence.split()
 
     # Get embeddings for each word
+<<<<<<< HEAD
+    word_embeddings = np.array([get_glove_embeddings(word, word_index_dict, embeddings, model_type) for word in words])
+=======
     word_embeddings = [get_glove_embeddings(word, word_index_dict, embeddings, model_type) for word in words]
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
 
     # Add embeddings for each word
     sum_embeddings = np.sum(word_embeddings, axis=0)
@@ -183,7 +199,10 @@ def get_sorted_cosine_similarity(embeddings_metadata):
     (50 pts)
     """
     categories = st.session_state.categories.split(" ")
+<<<<<<< HEAD
+=======
     st.session_state["categories"] = categories
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
     cosine_sim = {}
     if embeddings_metadata["embedding_model"] == "glove":
         word_index_dict = embeddings_metadata["word_index_dict"]
@@ -199,8 +218,14 @@ def get_sorted_cosine_similarity(embeddings_metadata):
         ##########################################
         embedding_for_categories={}
         for word in categories:
+<<<<<<< HEAD
+            embedding_for_categories[word]=get_glove_embeddings(word, word_index_dict, embeddings, model_type)
+            cosine_sim[word]=cosine_similarity(embedding_for_categories[word],input_embedding)
+        print("cosine_sim_glove: ",cosine_sim)
+=======
             category_embedding=get_glove_embeddings(word, word_index_dict, embeddings, model_type)
             cosine_sim[word]=cosine_similarity(category_embedding[word],input_embedding)
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
         
     else:
         model_name = embeddings_metadata["model_name"]
@@ -220,12 +245,24 @@ def get_sorted_cosine_similarity(embeddings_metadata):
         ##########################################
         for index in range(len(categories)):
             try:
+<<<<<<< HEAD
+                if(category_embeddings[categories[index]].any()):
+                    pass
+            except KeyError as e:
+                #If category is not found, category embeddings are updated
+                category_embeddings[categories[index]] = get_sentence_transformer_embeddings(categories[index])
+            cosine_sim[categories[index]]=cosine_similarity(category_embeddings[categories[index]],input_embedding)
+    
+    print("list(cosine_sim.values()).sort(): ",list(cosine_sim.values()).sort())
+    return dict(sorted(cosine_sim.items(), key=lambda item: item[1], reverse=True)) #Check again later!
+=======
                 cosine_sim[categories[index]]=cosine_similarity(category_embeddings[word],input_embedding)
             except:
                 #If category is not found, category embeddings are updated
                 st.session_state["cat_embed_" + model_name][categories[index]] = get_sentence_transformer_embeddings(categories[index])
     
     return cosine_sim[categories[word]].sort()
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
 
 
 def plot_piechart(sorted_cosine_scores_items):
@@ -245,6 +282,24 @@ def plot_piechart(sorted_cosine_scores_items):
 
 
 def plot_piechart_helper(sorted_cosine_scores_items):
+<<<<<<< HEAD
+    """
+    sorted_cosine_scores_items - A dict sorted in descending order of the values
+    """
+    # sorted_cosine_scores = np.array(
+    #     [
+    #         sorted_cosine_scores_items[index][1]
+    #         for index in range(len(sorted_cosine_scores_items))
+    #     ]
+    # )
+    # categories = st.session_state.categories.split(" ")
+    # categories_sorted = [
+    #     categories[sorted_cosine_scores_items[index][0]]
+    #     for index in range(len(sorted_cosine_scores_items))
+    # ]
+    sorted_cosine_scores=list(sorted_cosine_scores_items.values())
+    categories_sorted=list(sorted_cosine_scores_items.keys())
+=======
     sorted_cosine_scores = np.array(
         [
             sorted_cosine_scores_items[index][1]
@@ -256,6 +311,7 @@ def plot_piechart_helper(sorted_cosine_scores_items):
         categories[sorted_cosine_scores_items[index][0]]
         for index in range(len(sorted_cosine_scores_items))
     ]
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
     fig, ax = plt.subplots(figsize=(3, 3))
     my_explode = np.zeros(len(categories_sorted))
     my_explode[0] = 0.2
@@ -355,6 +411,23 @@ text_search = st.text_input(
 # st.session_state.text_search = text_search
 
 # Download glove embeddings if it doesn't exist
+<<<<<<< HEAD
+embeddings_path = os.path.join(os.getcwd(),"embeddings_" + str(model_type) + "_temp.npy")
+word_index_dict_path = os.path.join(os.getcwd(),"word_index_dict_" + str(model_type) + "_temp.pkl")
+
+# if not os.path.isfile(os.path.abspath(embeddings_path)) or not os.path.isfile(os.path.abspath(word_index_dict_path)):
+#     print("Model type = ", model_type)
+#     glove_path = "Data/glove_" + str(model_type) + ".pkl"
+#     print("glove_path = ", glove_path)
+
+#     # Download embeddings from google drive
+#     with st.spinner("Downloading glove embeddings..."):
+#         download_glove_embeddings_gdrive(model_type)
+
+
+# Load glove embeddings
+word_index_dict, embeddings = load_glove_embeddings_gdrive(model_type,embeddings_path,word_index_dict_path)
+=======
 embeddings_path = "embeddings_" + str(model_type) + "_temp.npy"
 word_index_dict_path = "word_index_dict_" + str(model_type) + "_temp.pkl"
 if not os.path.isfile(embeddings_path) or not os.path.isfile(word_index_dict_path):
@@ -369,6 +442,7 @@ if not os.path.isfile(embeddings_path) or not os.path.isfile(word_index_dict_pat
 
 # Load glove embeddings
 word_index_dict, embeddings = load_glove_embeddings_gdrive(model_type)
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
 
 
 # Find closest word to an input word
@@ -383,7 +457,11 @@ if st.session_state.text_search:
     }
     with st.spinner("Obtaining Cosine similarity for Glove..."):
         sorted_cosine_sim_glove = get_sorted_cosine_similarity(
+<<<<<<< HEAD
+            embeddings_metadata
+=======
             st.session_state.text_search, embeddings_metadata
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
         )
 
     # Sentence transformer embeddings
@@ -391,7 +469,11 @@ if st.session_state.text_search:
     embeddings_metadata = {"embedding_model": "transformers", "model_name": ""}
     with st.spinner("Obtaining Cosine similarity for 384d sentence transformer..."):
         sorted_cosine_sim_transformer = get_sorted_cosine_similarity(
+<<<<<<< HEAD
+            embeddings_metadata
+=======
             st.session_state.text_search, embeddings_metadata
+>>>>>>> 1041347e5013c9ea8491c6fd20f7b349af9101b0
         )
 
     # Results and Plot Pie Chart for Glove
